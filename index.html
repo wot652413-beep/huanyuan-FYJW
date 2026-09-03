@@ -6,7 +6,7 @@
   <meta name="description" content="法义经纬 Jurismind — 全场景法律案件智能化处理平台">
   <title>法义经纬 Jurismind</title>
   <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=topbar-capsule-align">
+  <link rel="stylesheet" href="styles.css?v=page-order-transition">
 </head>
 <body>
   <header class="topbar">
@@ -23,11 +23,11 @@
         <span><b>钳箱</b><small>qian box</small></span>
       </a>
       <a class="product-capsule" href="#revolution">
-        <img class="capsule-icon supplied-icon" src="assets/nav-jurismind-icon.png" alt="">
+        <img class="capsule-icon supplied-icon jurismind-icon" src="assets/nav-jurismind-icon.png" alt="">
         <span><b>律界芯人</b><small>jurismind</small></span>
       </a>
       <a class="product-capsule" href="#revolution">
-        <img class="capsule-icon supplied-icon lawclaw-icon" src="assets/nav-lawclaw-icon.png" alt="">
+        <img class="capsule-icon supplied-icon lawclaw-icon" src="assets/nav-lawclaw-icon-updated.png" alt="">
         <span><b>劳有钳</b><small>lawclaw</small></span>
       </a>
     </nav>
@@ -35,10 +35,51 @@
 
   <main>
     <section class="hero" id="home">
+      <img class="hero-background-media" src="assets/hero-background-loop.gif" alt="" aria-hidden="true">
       <div class="hero-shade"></div>
       <div class="hero-copy reveal">
         <h1><span>AI 赋能</span><em>让专业无限放大</em></h1>
         <p>以AI重新定义法律工作方式，助力法律人专注高价值判断</p>
+      </div>
+    </section>
+
+    <section class="legal-scenes" id="legal-scenes" aria-labelledby="legalScenesTitle">
+      <div class="scene-atmosphere" aria-hidden="true"></div>
+      <div class="legal-scenes-inner section-inner">
+        <div class="scene-copy">
+          <p class="scene-eyebrow" id="legalScenesTitle">法律 AI 全场景能力</p>
+          <div class="scene-list" role="tablist" aria-label="法律 AI 应用场景">
+            <button class="scene-item active" type="button" role="tab" aria-selected="true" data-scene="0">
+              <span class="scene-heading"><strong>芯盒</strong></span>
+              <span class="scene-detail">汇集专业能力与智能工具，让复杂法律任务拥有清晰、高效的处理入口。</span>
+              <span class="scene-more">了解更多 <i>→</i></span>
+            </button>
+            <button class="scene-item" type="button" role="tab" aria-selected="false" data-scene="1">
+              <span class="scene-heading"><strong>钳箱</strong></span>
+              <span class="scene-detail">集中管理案件材料与协作成果，使信息整理、调用和交付更加顺畅。</span>
+              <span class="scene-more">了解更多 <i>→</i></span>
+            </button>
+            <button class="scene-item" type="button" role="tab" aria-selected="false" data-scene="2">
+              <span class="scene-heading"><strong>律界芯人</strong></span>
+              <span class="scene-detail">深度理解法律语境，在检索、分析、策略与写作环节持续提供专业协助。</span>
+              <span class="scene-more">了解更多 <i>→</i></span>
+            </button>
+            <button class="scene-item" type="button" role="tab" aria-selected="false" data-scene="3">
+              <span class="scene-heading"><strong>劳有钳</strong></span>
+              <span class="scene-detail">面向劳动法律场景提供智能支持，帮助快速识别风险并形成处理建议。</span>
+              <span class="scene-more">了解更多 <i>→</i></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="scene-visual" aria-hidden="true">
+          <span class="scene-orbit orbit-one"></span>
+          <span class="scene-orbit orbit-two"></span>
+          <img class="scene-product-image scene-product-xinhe active" data-scene-symbol="0" src="assets/legal-scene-xinhe.png?v=103" alt="">
+          <img class="scene-product-image scene-product-qianbox" data-scene-symbol="1" src="assets/legal-scene-qianbox.png?v=104b" alt="">
+          <img class="scene-product-image scene-product-jurismind" data-scene-symbol="2" src="assets/legal-scene-jurismind.png?v=1" alt="">
+          <img class="scene-product-image scene-product-lawclaw" data-scene-symbol="3" src="assets/legal-scene-lawclaw.png?v=5" alt="">
+        </div>
       </div>
     </section>
 
@@ -60,7 +101,6 @@
     <section class="about light-section" id="about">
       <div class="section-heading reveal">
         <h2>关于我们</h2>
-        <p>ABOUT US</p>
         <i></i>
       </div>
       <div class="about-grid section-inner">
@@ -69,11 +109,11 @@
           <p>融合多模态智能体与法律知识图谱技术，构建海量法律知识库，赋予AI深度理解案件、精准推理逻辑的能力。</p>
         </article>
         <article class="about-item reveal">
-          <div class="about-title"><span>◈</span><h3>核心理念</h3></div>
+          <div class="about-title"><span>✦</span><h3>核心理念</h3></div>
           <p>以AI解放法律人，从繁琐回归智慧。我们坚持自主研发，深度融合智能技术与法律专业，让AI成为律师真正信赖的战略伙伴。</p>
         </article>
         <article class="about-item reveal">
-          <div class="about-title"><span>◆</span><h3>未来愿景</h3></div>
+          <div class="about-title"><span>✦</span><h3>未来愿景</h3></div>
           <p>从争议解决起步，持续拓展AI在法律实务中的深度应用，与行业共同开创智能化、专业化的法律服务新时代。</p>
         </article>
       </div>
@@ -82,13 +122,13 @@
     <section class="history" id="history">
       <div class="section-heading dark reveal"><h2>发展历程</h2><i></i></div>
       <div class="history-stage section-inner">
-        <button class="history-arrow prev" aria-label="上一个发展节点">‹</button>
+        <button class="history-arrow prev" aria-label="上一个发展节点"><span aria-hidden="true">‹</span></button>
         <div class="history-content" aria-live="polite">
           <span class="history-kicker" id="historyKicker">初心萌芽</span>
           <h3 id="historyTitle">星火启程，项目正式启动</h3>
           <p id="historyDescription">法律实务专家与人工智能团队汇聚，以“让智慧回归法律本身”为共同愿景，启动法义经纬项目。</p>
         </div>
-        <button class="history-arrow next" aria-label="下一个发展节点">›</button>
+        <button class="history-arrow next" aria-label="下一个发展节点"><span aria-hidden="true">›</span></button>
       </div>
       <div class="timeline section-inner" id="timeline" role="tablist" aria-label="发展时间线"></div>
     </section>
@@ -108,9 +148,10 @@
     <section class="partners light-section" id="partners">
       <div class="section-heading reveal"><h2>合作伙伴</h2><i></i></div>
       <div class="partner-row section-inner reveal">
-        <img src="assets/partner-1.png" alt="合作伙伴一">
-        <img src="assets/partner-3.png" alt="合作伙伴二">
-        <img src="assets/partner-2.png" alt="合作伙伴三">
+        <span class="partner-logo partner-duan"><img src="assets/partner-1.png" alt="段和段律师事务所"></span>
+        <span class="partner-logo partner-infinigence"><img src="assets/partner-infinigence.png" alt="无问芯穹 Infinigence"></span>
+        <span class="partner-logo partner-shlab"><img src="assets/partner-3.png" alt="上海人工智能实验室"></span>
+        <span class="partner-logo partner-dishui"><img src="assets/partner-2.png" alt="滴水湖 AI 创新港"></span>
       </div>
     </section>
   </main>
@@ -138,6 +179,6 @@
       <span>网信算备310115871743901260017号</span><span>隐私政策</span><span>用户协议</span>
     </div>
   </footer>
-  <script src="script.js?v=workflow-title-patches"></script>
+  <script src="script.js?v=scene-index-removed"></script>
 </body>
 </html>

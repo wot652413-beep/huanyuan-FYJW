@@ -95,6 +95,44 @@ function activateFeature(card){document.querySelectorAll('.feature-card').forEac
 featureDeck.addEventListener('mouseover',event=>{const card=event.target.closest('.feature-card');if(card)activateFeature(card)});
 featureDeck.addEventListener('mouseleave',()=>activateFeature(null));
 
+const legalScenesSection=document.querySelector('.legal-scenes');
+const sceneItems=[...document.querySelectorAll('.scene-item')];
+const sceneSymbols=[...document.querySelectorAll('[data-scene-symbol]')];
+let activeScene=0;
+let sceneTimer=null;
+
+function setActiveScene(index){
+  activeScene=(index+sceneItems.length)%sceneItems.length;
+  sceneItems.forEach((item,itemIndex)=>{
+    const isActive=itemIndex===activeScene;
+    item.classList.toggle('active',isActive);
+    item.setAttribute('aria-selected',String(isActive));
+  });
+  sceneSymbols.forEach((symbol,symbolIndex)=>{
+    const isActive=symbolIndex===activeScene;
+    symbol.classList.remove('active');
+    if(isActive)requestAnimationFrame(()=>symbol.classList.add('active'));
+  });
+}
+
+function startSceneRotation(){
+  window.clearInterval(sceneTimer);
+  sceneTimer=window.setInterval(()=>setActiveScene(activeScene+1),3200);
+}
+
+sceneItems.forEach((item,index)=>{
+  item.addEventListener('mouseenter',()=>setActiveScene(index));
+  item.addEventListener('focus',()=>setActiveScene(index));
+  item.addEventListener('click',()=>{setActiveScene(index);startSceneRotation()});
+});
+
+const sceneObserver=new IntersectionObserver(([entry])=>{
+  if(entry.isIntersecting)startSceneRotation();
+  else window.clearInterval(sceneTimer);
+},{threshold:.35});
+sceneObserver.observe(legalScenesSection);
+setActiveScene(0);
+
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.14});
 document.querySelectorAll('.reveal').forEach(element=>observer.observe(element));
 
