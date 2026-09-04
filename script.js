@@ -64,9 +64,27 @@ function setHistory(index,direction){
 timeline.addEventListener('click',event=>{const button=event.target.closest('.timeline-btn');if(button)setHistory(Number(button.dataset.index))});
 document.querySelector('.history-arrow.prev').addEventListener('click',()=>setHistory(historyIndex-1,'backward'));
 document.querySelector('.history-arrow.next').addEventListener('click',()=>setHistory(historyIndex+1,'forward'));
-let historyTimer=window.setInterval(()=>setHistory(historyIndex+1,'forward'),2500);
-document.querySelector('.history').addEventListener('mouseenter',()=>clearInterval(historyTimer));
-document.querySelector('.history').addEventListener('mouseleave',()=>{historyTimer=window.setInterval(()=>setHistory(historyIndex+1,'forward'),2500)});
+const historySection=document.querySelector('.history');
+let historyTimer=null;
+let historyInView=false;
+function stopHistoryRotation(){
+  window.clearInterval(historyTimer);
+  historyTimer=null;
+}
+function startHistoryRotation(){
+  stopHistoryRotation();
+  historyTimer=window.setInterval(()=>setHistory(historyIndex+1,'forward'),2500);
+}
+function syncHistoryRotation(){
+  if(historyInView&&!document.hidden)startHistoryRotation();
+  else stopHistoryRotation();
+}
+const historyRotationObserver=new IntersectionObserver(([entry])=>{
+  historyInView=entry.isIntersecting;
+  syncHistoryRotation();
+},{threshold:.55});
+historyRotationObserver.observe(historySection);
+document.addEventListener('visibilitychange',syncHistoryRotation);
 
 const initialHistory=historyItems[historyIndex];
 document.querySelector('#historyKicker').textContent=initialHistory.kicker;
@@ -84,7 +102,7 @@ const timelineObserver=new IntersectionObserver(entries=>entries.forEach(entry=>
   requestAnimationFrame(()=>requestAnimationFrame(()=>{progress.style.width=targetWidth}));
   timelineObserver.disconnect();
 }),{threshold:.35});
-timelineObserver.observe(document.querySelector('.history'));
+timelineObserver.observe(historySection);
 
 function newsCard(item){return `<article class="news-card"><img class="news-image" src="${item.image}" alt="${item.title}"><div class="news-body"><h3>${item.title}</h3><div class="news-meta"><span>⌖ 中国，上海</span><span>◷ ${item.date}</span></div></div><div class="news-full"><h3>${item.title}</h3><p>${item.full}</p><small>中国，上海 · ${item.date}</small></div></article>`}
 document.querySelector('#newsTrack').innerHTML=[...newsItems,...newsItems].map(newsCard).join('');
@@ -140,3 +158,182 @@ const topbar=document.querySelector('.topbar');
 function updateTopbar(){topbar.classList.toggle('scrolled',window.scrollY>24)}
 updateTopbar();
 window.addEventListener('scroll',updateTopbar,{passive:true});
+
+const advantagesSection=document.querySelector('.advantages');
+const advantagesStage=advantagesSection?.querySelector('.advantages-stage');
+const advantagesTrack=advantagesSection?.querySelector('.advantages-track');
+const advantageCards=advantagesSection?[...advantagesSection.querySelectorAll('.advantage-card')]:[];
+const advantageLoopClone=advantageCards[0]?.cloneNode(true);
+const advantageLoopNextClone=advantageCards[1]?.cloneNode(true);
+const advantageLoopLastClone=advantageCards.at(-1)?.cloneNode(true);
+let advantageIndex=0;
+let advantageLooping=false;
+let advantageAutoplayTimer=null;
+let advantageIsVisible=false;
+
+if(advantageLoopClone&&advantagesTrack){
+  advantageLoopClone.classList.add('is-clone');
+  advantageLoopClone.setAttribute('aria-hidden','true');
+  advantageLoopClone.removeAttribute('aria-current');
+  advantagesTrack.appendChild(advantageLoopClone);
+}
+if(advantageLoopNextClone&&advantagesTrack){
+  advantageLoopNextClone.classList.add('is-clone');
+  advantageLoopNextClone.setAttribute('aria-hidden','true');
+  advantageLoopNextClone.removeAttribute('aria-current');
+  advantagesTrack.appendChild(advantageLoopNextClone);
+}
+if(advantageLoopLastClone&&advantagesTrack){
+  advantageLoopLastClone.classList.add('is-clone');
+  advantageLoopLastClone.setAttribute('aria-hidden','true');
+  advantageLoopLastClone.removeAttribute('aria-current');
+  advantagesTrack.insertBefore(advantageLoopLastClone,advantagesTrack.firstChild);
+}
+
+function positionAdvantageTrack(targetCard=advantageCards[advantageIndex]){
+  if(!advantagesStage||!advantagesTrack||window.innerWidth<=900)return;
+  if(!targetCard)return;
+  const activeCenter=targetCard.offsetLeft+targetCard.offsetWidth/2;
+  advantagesTrack.style.transform=`translate3d(${-activeCenter}px,-50%,0)`;
+}
+
+function setAdvantage(index){
+  if(!advantageCards.length||advantageLooping)return;
+  advantageIndex=Math.max(0,Math.min(index,advantageCards.length-1));
+  advantagesSection.dataset.step=String(advantageIndex);
+  advantageCards.forEach((card,cardIndex)=>{
+    card.classList.toggle('is-active',cardIndex===advantageIndex);
+    card.classList.toggle('is-past',cardIndex===advantageIndex-1);
+    card.classList.toggle('is-next',cardIndex===advantageIndex+1);
+    card.setAttribute('aria-current',cardIndex===advantageIndex?'step':'false');
+  });
+  if(advantageLoopClone){
+    advantageLoopClone.classList.remove('is-active','is-past');
+    advantageLoopClone.classList.toggle('is-next',advantageIndex===advantageCards.length-1);
+  }
+  advantageLoopNextClone?.classList.remove('is-active','is-past','is-next');
+  if(advantageLoopLastClone){
+    advantageLoopLastClone.classList.remove('is-active','is-next');
+    advantageLoopLastClone.classList.toggle('is-past',advantageIndex===0);
+  }
+  requestAnimationFrame(()=>positionAdvantageTrack());
+}
+
+function loopAdvantageToStart(){
+  if(!advantageLoopClone||!advantagesTrack)return setAdvantage(0);
+  advantageLooping=true;
+  advantageCards.forEach((card,cardIndex)=>{
+    card.classList.remove('is-active','is-next');
+    card.classList.toggle('is-past',cardIndex===advantageCards.length-1);
+    card.setAttribute('aria-current','false');
+  });
+  advantageLoopClone.classList.remove('is-next','is-past');
+  advantageLoopClone.classList.add('is-active');
+  advantageLoopNextClone?.classList.add('is-next');
+  advantageLoopLastClone?.classList.remove('is-active','is-past','is-next');
+  requestAnimationFrame(()=>positionAdvantageTrack(advantageLoopClone));
+  window.setTimeout(()=>{
+    advantagesTrack.classList.add('is-resetting');
+    advantagesTrack.style.transition='none';
+    advantageIndex=0;
+    advantageLoopClone.classList.remove('is-active','is-past','is-next');
+    advantageLoopNextClone?.classList.remove('is-active','is-past','is-next');
+    advantageLoopLastClone?.classList.add('is-past');
+    advantageCards.forEach((card,cardIndex)=>{
+      card.classList.toggle('is-active',cardIndex===0);
+      card.classList.remove('is-past');
+      card.classList.toggle('is-next',cardIndex===1);
+      card.setAttribute('aria-current',cardIndex===0?'step':'false');
+    });
+    advantagesSection.dataset.step='0';
+    positionAdvantageTrack(advantageCards[0]);
+    void advantagesTrack.offsetWidth;
+    advantagesTrack.style.transition='';
+    advantagesTrack.classList.remove('is-resetting');
+    advantageLooping=false;
+  },900);
+}
+
+function loopAdvantageToEnd(){
+  if(!advantageLoopLastClone||!advantagesTrack)return setAdvantage(advantageCards.length-1);
+  advantageLooping=true;
+  advantageCards.forEach((card,cardIndex)=>{
+    card.classList.remove('is-active','is-past');
+    card.classList.toggle('is-next',cardIndex===0);
+    card.setAttribute('aria-current','false');
+  });
+  advantageLoopLastClone.classList.remove('is-past','is-next');
+  advantageLoopLastClone.classList.add('is-active');
+  advantageLoopClone?.classList.remove('is-active','is-past','is-next');
+  advantageLoopNextClone?.classList.remove('is-active','is-past','is-next');
+  requestAnimationFrame(()=>positionAdvantageTrack(advantageLoopLastClone));
+  window.setTimeout(()=>{
+    advantagesTrack.classList.add('is-resetting');
+    advantagesTrack.style.transition='none';
+    advantageIndex=advantageCards.length-1;
+    advantageLoopLastClone.classList.remove('is-active','is-past','is-next');
+    advantageCards.forEach((card,cardIndex)=>{
+      card.classList.toggle('is-active',cardIndex===advantageIndex);
+      card.classList.toggle('is-past',cardIndex===advantageIndex-1);
+      card.classList.remove('is-next');
+      card.setAttribute('aria-current',cardIndex===advantageIndex?'step':'false');
+    });
+    advantageLoopClone?.classList.add('is-next');
+    advantagesSection.dataset.step=String(advantageIndex);
+    positionAdvantageTrack(advantageCards[advantageIndex]);
+    void advantagesTrack.offsetWidth;
+    advantagesTrack.style.transition='';
+    advantagesTrack.classList.remove('is-resetting');
+    advantageLooping=false;
+  },900);
+}
+
+function advanceAdvantage(){
+  if(advantageLooping||!advantageCards.length)return;
+  if(advantageIndex===advantageCards.length-1){
+    loopAdvantageToStart();
+  }else{
+    setAdvantage(advantageIndex+1);
+  }
+}
+
+function startAdvantageAutoplay(){
+  window.clearInterval(advantageAutoplayTimer);
+  if(!advantageIsVisible||document.hidden||window.innerWidth<=900)return;
+  advantageAutoplayTimer=window.setInterval(advanceAdvantage,4000);
+}
+
+function stopAdvantageAutoplay(){
+  window.clearInterval(advantageAutoplayTimer);
+  advantageAutoplayTimer=null;
+}
+
+advantagesTrack?.addEventListener('click',event=>{
+  const card=event.target.closest('.advantage-card');
+  if(!card||!advantagesTrack.contains(card)||advantageLooping)return;
+  const index=Number(card.dataset.advantage);
+  if(!Number.isInteger(index))return;
+  if(card===advantageLoopClone&&advantageIndex===advantageCards.length-1){
+    loopAdvantageToStart();
+  }else if(card===advantageLoopLastClone&&advantageIndex===0){
+    loopAdvantageToEnd();
+  }else{
+    setAdvantage(index);
+  }
+  startAdvantageAutoplay();
+});
+window.addEventListener('resize',()=>{
+  positionAdvantageTrack();
+  startAdvantageAutoplay();
+},{passive:true});
+document.addEventListener('visibilitychange',()=>document.hidden?stopAdvantageAutoplay():startAdvantageAutoplay());
+if(advantagesSection){
+  const advantageVisibilityObserver=new IntersectionObserver(([entry])=>{
+    advantageIsVisible=entry.isIntersecting;
+    if(advantageIsVisible)startAdvantageAutoplay();
+    else stopAdvantageAutoplay();
+  },{threshold:.45});
+  advantageVisibilityObserver.observe(advantagesSection);
+}
+setAdvantage(0);
+positionAdvantageTrack();
